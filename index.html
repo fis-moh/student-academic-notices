@@ -5,11 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>نظام إشعارات تدني المستوى الدراسي</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
-  <script src="https://unpkg.com/@pdf-lib/fontkit@0.0.4"></script>
+  <!-- مكتبة تحويل HTML إلى PDF مباشرة بدون مشاكل الخطوط -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Cairo', sans-serif; }
+    @media print {
+      body { background: white; }
+    }
   </style>
 </head>
 <body class="bg-slate-100 min-h-screen py-8 px-4">
@@ -66,13 +69,7 @@
           <input type="text" id="sub5" placeholder="المادة الخامسة" class="px-3 py-2 border rounded-lg text-sm">
           <input type="text" id="sub6" placeholder="المادة السادسة" class="px-3 py-2 border rounded-lg text-sm">
         </div>
-        <p class="text-xs text-slate-500 mt-1">* الحقول الفارغة ستظهر تلقائياً بشرطة (-).</p>
-      </div>
-
-      <!-- الإدارة والتوقيعات -->
-      <div class="bg-slate-50 p-3 rounded-lg text-xs text-slate-600 flex justify-between">
-        <span>الموجه الطلابي: <b>هزان العثمان</b></span>
-        <span>مدير المدرسة: <b>زيد آل داود</b></span>
+        <p class="text-xs text-slate-500 mt-1">* الحقول المتروكة فارغة ستظهر تلقائياً بشرطة (-).</p>
       </div>
 
       <button type="submit" id="submitBtn" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-3 px-4 rounded-xl shadow transition duration-200">
@@ -81,8 +78,81 @@
     </form>
   </div>
 
+  <!-- قالب المستند الرسمي المخفي المخصص لطباعة الـ PDF -->
+  <div id="pdfTemplate" style="display: none; width: 680px; padding: 40px; background: #fff; font-family: 'Cairo', sans-serif; direction: rtl; border: 4px double #065f46;">
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #065f46; padding-bottom: 15px; margin-bottom: 25px;">
+      <div>
+        <h3 style="margin: 0; font-size: 14px; font-weight: bold;">المملكة العربية السعودية</h3>
+        <h4 style="margin: 4px 0; font-size: 13px;">وزارة التعليم</h4>
+        <h4 style="margin: 4px 0; font-size: 13px;">الإدارة العامة للتعليم بمنطقة الرياض</h4>
+        <h4 style="margin: 0; font-size: 13px; font-weight: bold; color: #065f46;">ابتدائية ومتوسطة وثانوية نعام</h4>
+      </div>
+      <div style="text-align: center;">
+        <span style="display: inline-block; padding: 6px 14px; background: #ecfdf5; border: 1px solid #059669; border-radius: 8px; font-weight: bold; color: #065f46; font-size: 14px;">
+          إشعار تدني مستوى دراسي
+        </span>
+      </div>
+    </div>
+
+    <div style="margin: 30px 0; line-height: 2; font-size: 15px;">
+      <p style="margin-bottom: 15px;">
+        المكرم ولي أمر الطالب: <b id="outName" style="color: #065f46; font-size: 16px;"></b> المحترم
+      </p>
+      <p style="margin-bottom: 15px;">
+        السلام عليكم ورحمة الله وبركاته،،،
+      </p>
+      <p style="text-align: justify; margin-bottom: 25px;">
+        نود إشعاركم بأن ابنكم يواجه بعض الصعوبات وتدنياً في مستواه التحصيلي خلال <b id="outTerm"></b> (<b id="outPeriod"></b>) للعام الدراسي <b id="outYear"></b>، وذلك في المواد التالية:
+      </p>
+
+      <!-- جدول المواد -->
+      <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px; text-align: center;">
+        <thead>
+          <tr style="background: #f0fdf4;">
+            <th style="border: 1px solid #cbd5e1; padding: 10px; font-size: 14px;">المادة (1)</th>
+            <th style="border: 1px solid #cbd5e1; padding: 10px; font-size: 14px;">المادة (2)</th>
+            <th style="border: 1px solid #cbd5e1; padding: 10px; font-size: 14px;">المادة (3)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td id="outS1" style="border: 1px solid #cbd5e1; padding: 10px; font-weight: 600;"></td>
+            <td id="outS2" style="border: 1px solid #cbd5e1; padding: 10px; font-weight: 600;"></td>
+            <td id="outS3" style="border: 1px solid #cbd5e1; padding: 10px; font-weight: 600;"></td>
+          </tr>
+          <tr style="background: #f0fdf4;">
+            <th style="border: 1px solid #cbd5e1; padding: 10px; font-size: 14px;">المادة (4)</th>
+            <th style="border: 1px solid #cbd5e1; padding: 10px; font-size: 14px;">المادة (5)</th>
+            <th style="border: 1px solid #cbd5e1; padding: 10px; font-size: 14px;">المادة (6)</th>
+          </tr>
+          <tr>
+            <td id="outS4" style="border: 1px solid #cbd5e1; padding: 10px; font-weight: 600;"></td>
+            <td id="outS5" style="border: 1px solid #cbd5e1; padding: 10px; font-weight: 600;"></td>
+            <td id="outS6" style="border: 1px solid #cbd5e1; padding: 10px; font-weight: 600;"></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p style="text-align: justify;">
+        نأمل منكم التعاون مع المدرسة ومتابعة الطالب وحثه على الجد والاجتهاد لرفع مستواه التعليمي وتحقيق النتائج المرجوة.
+      </p>
+    </div>
+
+    <!-- التوقيعات -->
+    <div style="display: flex; justify-content: space-between; margin-top: 60px; padding: 0 30px;">
+      <div style="text-align: center;">
+        <p style="font-weight: bold; margin-bottom: 35px;">الموجه الطلابي</p>
+        <p style="font-weight: bold; color: #1e293b;">هزان العثمان</p>
+      </div>
+      <div style="text-align: center;">
+        <p style="font-weight: bold; margin-bottom: 35px;">مدير المدرسة</p>
+        <p style="font-weight: bold; color: #1e293b;">زيد آل داود</p>
+      </div>
+    </div>
+  </div>
+
   <script>
-    document.getElementById('noticeForm').addEventListener('submit', async function(e) {
+    document.getElementById('noticeForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const btn = document.getElementById('submitBtn');
       btn.innerText = 'جاري توليد ملف الـ PDF...';
@@ -92,74 +162,41 @@
       const term = document.getElementById('term').value;
       const period = document.getElementById('period').value;
       const year = document.getElementById('academicYear').value;
-      
-      const s1 = document.getElementById('sub1').value || '-';
-      const s2 = document.getElementById('sub2').value || '-';
-      const s3 = document.getElementById('sub3').value || '-';
-      const s4 = document.getElementById('sub4').value || '-';
-      const s5 = document.getElementById('sub5').value || '-';
-      const s6 = document.getElementById('sub6').value || '-';
 
-      try {
-        const { PDFDocument, rgb } = PDFLib;
-        const pdfDoc = await PDFDocument.create();
-        pdfDoc.registerFontkit(fontkit);
+      document.getElementById('outName').innerText = name;
+      document.getElementById('outTerm').innerText = term;
+      document.getElementById('outPeriod').innerText = period;
+      document.getElementById('outYear').innerText = year;
 
-        // تحميل خط عربي يدعم ترميز النصوص
-        const fontUrl = 'https://fonts.gstatic.com/s/amiri/v27/J7acnpF-01K8-3jZtqfK8Y1s.woff2';
-        const fontBytes = await fetch(fontUrl).then(res => res.arrayBuffer());
-        const customFont = await pdfDoc.embedFont(fontBytes);
+      document.getElementById('outS1').innerText = document.getElementById('sub1').value || '-';
+      document.getElementById('outS2').innerText = document.getElementById('sub2').value || '-';
+      document.getElementById('outS3').innerText = document.getElementById('sub3').value || '-';
+      document.getElementById('outS4').innerText = document.getElementById('sub4').value || '-';
+      document.getElementById('outS5').innerText = document.getElementById('sub5').value || '-';
+      document.getElementById('outS6').innerText = document.getElementById('sub6').value || '-';
 
-        const page = pdfDoc.addPage([595.28, 841.89]); // مقاس A4
-        const { width, height } = page.getSize();
+      const element = document.getElementById('pdfTemplate');
+      element.style.display = 'block';
 
-        // رسم إطار خارجي
-        page.drawRectangle({
-          x: 20, y: 20,
-          width: width - 40, height: height - 40,
-          borderWidth: 2,
-          borderColor: rgb(0.1, 0.4, 0.2),
-          color: rgb(1, 1, 1)
-        });
+      const opt = {
+        margin:       10,
+        filename:     `إشعار تدني - ${name} - ${period}.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
 
-        // الترويسة
-        page.drawText('المملكة العربية السعودية - وزارة التعليم', { x: 340, y: height - 60, size: 12, font: customFont });
-        page.drawText('الإدارة العامة للتعليم بمنطقة الرياض', { x: 360, y: height - 80, size: 12, font: customFont });
-        page.drawText('ابتدائية ومتوسطة وثانوية نعام', { x: 380, y: height - 100, size: 12, font: customFont });
-
-        // العنوان
-        page.drawText(`إشعار تدني مستوى دراسي (${period})`, { x: 180, y: height - 160, size: 16, font: customFont, color: rgb(0.7, 0.1, 0.1) });
-
-        // نص الخطاب
-        const bodyText = `إلى ولي أمر الطالب: ${name} المحترم\n` +
-          `السلام عليكم ورحمة الله وبركاته،،،\n` +
-          `نحيطكم علماً بأن ابنكم يواجه تدنياً في مستواه الدراسي خلال (${term}) للعام ${year} في المواد التالية:\n\n` +
-          `1. ${s1}    2. ${s2}    3. ${s3}\n` +
-          `4. ${s4}    5. ${s5}    6. ${s6}\n\n` +
-          `نأمل منكم التعاون ومتابعة الطالب حرصاً على مستقبله الدراسي.`;
-
-        page.drawText(bodyText, { x: 60, y: height - 230, size: 13, font: customFont, lineHeight: 22 });
-
-        // التوقيعات
-        page.drawText('الموجه الطلابي: هزان العثمان', { x: 360, y: 120, size: 12, font: customFont });
-        page.drawText('مدير المدرسة: زيد آل داود', { x: 90, y: 120, size: 12, font: customFont });
-
-        // حفظ وتحميل الملف
-        const pdfBytes = await pdfDoc.save();
-        const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = `إشعار تدني - ${name} - ${period}.pdf`;
-        link.click();
-
-        alert('تم توليد إشعار PDF وتحميله بنجاح!');
-      } catch (err) {
-        console.error(err);
-        alert('حدث خطأ أثناء إنشاء الملف، يرجى المحاولة مرة أخرى.');
-      } finally {
+      html2pdf().set(opt).from(element).save().then(() => {
+        element.style.display = 'none';
         btn.innerText = 'توليد إشعار PDF وتحميله';
         btn.disabled = false;
-      }
+      }).catch(err => {
+        console.error(err);
+        element.style.display = 'none';
+        alert('حدث خطأ أثناء تحميل الملف، يرجى المحاولة ثانية.');
+        btn.innerText = 'توليد إشعار PDF وتحميله';
+        btn.disabled = false;
+      });
     });
   </script>
 </body>

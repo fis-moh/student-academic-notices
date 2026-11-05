@@ -1,360 +1,268 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>نظام إشعارات المستوى الدراسي | مدرسة نعام</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- مكتبة تحويل HTML إلى PDF مباشرة وبأعلى دقة -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
-  <style>
-    * { font-family: 'Tajawal', sans-serif; }
-    .emerald-gradient {
-      background: linear-gradient(135deg, #064e3b 0%, #047857 50%, #0f766e 100%);
-    }
-  </style>
-</head>
-<body class="bg-slate-50 min-h-screen text-slate-800 antialiased selection:bg-emerald-100">
-
-  <!-- شريط علوي -->
-  <header class="emerald-gradient text-white shadow-lg sticky top-0 z-20">
-    <div class="max-w-4xl mx-auto px-4 py-3 sm:py-4 flex items-center justify-between">
-      <div class="flex items-center space-x-3 space-x-reverse">
-        <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white/10 backdrop-blur rounded-xl flex items-center justify-center border border-white/20">
-          <svg class="w-6 h-6 text-emerald-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-          </svg>
-        </div>
-        <div>
-          <h1 class="text-base sm:text-lg font-bold leading-tight">الإدارة العامة للتعليم بمنطقة الرياض</h1>
-          <p class="text-xs sm:text-sm text-emerald-100 opacity-90">ابتدائية ومتوسطة وثانوية نعام</p>
-        </div>
-      </div>
-      <span class="hidden sm:inline-block bg-white/15 px-3 py-1 rounded-full text-xs font-medium border border-white/20">
-        بوابة الإشعارات الرسمية
-      </span>
-    </div>
-  </header>
-
-  <!-- جسم الصفحة والحاوية المتجاوبة -->
-  <main class="max-w-3xl mx-auto p-4 sm:p-6 md:p-8">
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
-      
-      <!-- عنوان البطاقة -->
-      <div class="p-5 sm:p-6 border-b border-slate-100 bg-slate-50/50">
-        <h2 class="text-lg sm:text-xl font-bold text-slate-800 flex items-center gap-2">
-          <span class="w-2.5 h-6 bg-emerald-600 rounded-full inline-block"></span>
-          إصدار إشعار تدني مستوى تحصيلي
-        </h2>
-        <p class="text-xs sm:text-sm text-slate-500 mt-1 mr-4.5">
-          أدخل بيانات الطالب ومواد الضعف ليتم توليد الخطاب الرسمي بصيغة PDF فوراً.
-        </p>
-      </div>
-
-      <!-- النموذج الرئيسي -->
-      <form id="noticeForm" class="p-5 sm:p-8 space-y-6">
-
-        <!-- قسم معلومات الطالب -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-          <div class="sm:col-span-2">
-            <label class="block text-xs sm:text-sm font-bold text-slate-700 mb-1.5">اسم الطالب ثلاثياً أو رباعياً <span class="text-rose-500">*</span></label>
-            <input type="text" id="studentName" required placeholder="مثال: محمد بن عبد الله آل داود"
-                   class="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition bg-white">
-          </div>
-
-          <div>
-            <label class="block text-xs sm:text-sm font-bold text-slate-700 mb-1.5">الفصل الدراسي <span class="text-rose-500">*</span></label>
-            <select id="term" class="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none bg-white">
-              <option value="الفصل الدراسي الأول">الفصل الدراسي الأول</option>
-              <option value="الفصل الدراسي الثاني">الفصل الدراسي الثاني</option>
-              <option value="الفصل الدراسي الثالث">الفصل الدراسي الثالث</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="block text-xs sm:text-sm font-bold text-slate-700 mb-1.5">الفترة <span class="text-rose-500">*</span></label>
-            <select id="period" class="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none bg-white">
-              <option value="الفترة الأولى">الفترة الأولى</option>
-              <option value="الفترة الثانية">الفترة الثانية</option>
-              <option value="منتصف الفصل الدراسي">منتصف الفصل الدراسي</option>
-              <option value="نهاية الفصل الدراسي">نهاية الفصل الدراسي</option>
-            </select>
-          </div>
-
-          <div class="sm:col-span-2">
-            <label class="block text-xs sm:text-sm font-bold text-slate-700 mb-1.5">العام الدراسي <span class="text-rose-500">*</span></label>
-            <input type="text" id="academicYear" required value="1448 هـ"
-                   class="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition bg-white">
-          </div>
-        </div>
-
-        <!-- قسم المواد الديناميكي -->
-        <div class="pt-4 border-t border-slate-100">
-          <div class="flex items-center justify-between mb-3">
-            <div>
-              <label class="block text-xs sm:text-sm font-bold text-slate-700">مواد التعثر / تدني المستوى <span class="text-rose-500">*</span></label>
-              <p class="text-xs text-slate-400">أدخل مادة واحدة على الأقل، وأضف ما تشاء حسب حالة الطالب.</p>
-            </div>
-            <button type="button" id="addSubjectBtn" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 text-xs sm:text-sm font-semibold rounded-lg transition">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-              إضافة مادة أخرى
-            </button>
-          </div>
-
-          <div id="subjectsContainer" class="space-y-3">
-            <!-- الحقل الأول الافتراضي -->
-            <div class="subject-row flex items-center gap-2">
-              <span class="w-7 h-9 flex items-center justify-center bg-slate-100 text-slate-600 font-bold text-xs rounded-lg border border-slate-200">1</span>
-              <input type="text" class="subject-input flex-1 px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none" required placeholder="اسم المادة (مثال: الرياضيات)">
-              <div class="w-9"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- معلومات التوقيع والاعتماد المعتمدة -->
-        <div class="bg-slate-50 rounded-xl p-4 border border-slate-200/70 grid grid-cols-2 gap-4 text-center">
-          <div>
-            <span class="block text-xs text-slate-400 font-medium mb-0.5">الموجه الطلابي</span>
-            <span class="text-xs sm:text-sm font-bold text-slate-700">أ. هزان العثمان</span>
-          </div>
-          <div class="border-r border-slate-200">
-            <span class="block text-xs text-slate-400 font-medium mb-0.5">مدير المدرسة</span>
-            <span class="text-xs sm:text-sm font-bold text-slate-700">أ. زيد آل داود</span>
-          </div>
-        </div>
-
-        <!-- زر التوليد والتحميل -->
-        <button type="submit" id="submitBtn" class="w-full emerald-gradient hover:opacity-95 text-white font-bold py-3.5 sm:py-4 px-6 rounded-xl shadow-md hover:shadow-lg transition flex items-center justify-center gap-2 text-sm sm:text-base">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-          </svg>
-          <span>توليد إشعار PDF وتحميله فوراً</span>
-        </button>
-      </form>
-    </div>
-  </main>
-
-  <!-- ==================== قالب وثيقة الـ PDF الرسمية (مخفي ومخصص للطباعة) ==================== -->
-  <div style="position: absolute; left: -9999px; top: -9999px;">
-    <div id="pdfContent" style="width: 794px; min-height: 1120px; background: #ffffff; padding: 45px 55px; box-sizing: border-box; font-family: 'Tajawal', sans-serif; direction: rtl; color: #1e293b; position: relative;">
-      
-      <!-- إطار جمالي مزدوج يحاكي المعاملات الرسمية -->
-      <div style="position: absolute; top: 20px; bottom: 20px; left: 20px; right: 20px; border: 2px solid #064e3b; pointer-events: none;"></div>
-      <div style="position: absolute; top: 24px; bottom: 24px; left: 24px; right: 24px; border: 1px solid #047857; pointer-events: none;"></div>
-
-      <!-- الترويسة الوزارية الرسمية -->
-      <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #064e3b; padding-bottom: 18px; margin-bottom: 25px;">
-        <div style="text-align: right; line-height: 1.6;">
-          <h3 style="margin: 0; font-size: 14px; font-weight: 800; color: #064e3b;">المملكة العربية السعودية</h3>
-          <h4 style="margin: 2px 0; font-size: 13px; font-weight: 700; color: #334155;">وزارة التعليم</h4>
-          <h4 style="margin: 2px 0; font-size: 12.5px; font-weight: 600; color: #475569;">الإدارة العامة للتعليم بمنطقة الرياض</h4>
-          <h4 style="margin: 2px 0; font-size: 13px; font-weight: 800; color: #047857;">ابتدائية ومتوسطة وثانوية نعام</h4>
-        </div>
-
-        <div style="text-align: center; padding-top: 10px;">
-          <div style="background: #f0fdf4; border: 1.5px solid #059669; border-radius: 12px; padding: 8px 24px;">
-            <span style="font-size: 16px; font-weight: 800; color: #064e3b; display: block;">إشعار تدني مستوى دراسي</span>
-            <span id="pdfPeriodBadge" style="font-size: 12px; font-weight: 600; color: #047857; display: block; margin-top: 2px;"></span>
-          </div>
-        </div>
-
-        <div style="text-align: left; font-size: 12px; line-height: 1.8; color: #475569;">
-          <div><b>العام الدراسي:</b> <span id="pdfYear"></span></div>
-          <div><b>الفصل:</b> <span id="pdfTerm"></span></div>
-          <div><b>التاريخ:</b> <span>${new Date().toLocaleDateString('ar-SA')}</span></div>
-        </div>
-      </div>
-
-      <!-- متن الخطاب اللغوي والتربوي الفصيح -->
-      <div style="margin: 25px 0; line-height: 2; font-size: 14.5px;">
-        <p style="margin-bottom: 15px; font-size: 15px;">
-          <b>المكرم ولي أمر الطالب:</b> 
-          <span id="pdfStudentName" style="color: #064e3b; font-weight: 800; font-size: 16px; padding: 0 4px;"></span> 
-          <span style="font-size: 13px; color: #64748b;">(سلمه الله)</span>
-        </p>
-
-        <p style="margin-bottom: 15px; font-weight: 700; color: #1e293b;">
-          السلام عليكم ورحمة الله وبركاته،،، وبعد:
-        </p>
-
-        <p style="text-align: justify; margin-bottom: 20px; text-indent: 20px; color: #334155;">
-          انطلاقاً من مبدأ التكامل والشراكة الإيجابية والوثيقة بين البيت والمدرسة، وحرصاً على مصلحة ابننا ومسيرته التعليمية؛ نود إحاطتكم علماً بأنه قد لُوحظ تدنٍ وتراجعٌ في مستواه التحصيلي خلال 
-          <b id="pdfTermBody" style="color: #064e3b;"></b> (<b id="pdfPeriodBody" style="color: #047857;"></b>) 
-          في المقرر/المقررات الدراسية الموضحة في الجدول أدناه:
-        </p>
-
-        <!-- جدول المواد المتغير ديناميكياً بدقة -->
-        <div style="margin: 25px 0;">
-          <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 14px;">
-            <thead>
-              <tr style="background: #ecfdf5; color: #064e3b;">
-                <th style="border: 1px solid #a7f3d0; padding: 10px; width: 20%; font-weight: 800;">م</th>
-                <th style="border: 1px solid #a7f3d0; padding: 10px; width: 80%; font-weight: 800;">المادة الدراسية المتعثر فيها</th>
-              </tr>
-            </thead>
-            <tbody id="pdfTableBody">
-              <!-- تُضاف الصفوف هنا بالجافاسكريبت تلقائياً -->
-            </tbody>
-          </table>
-        </div>
-
-        <p style="text-align: justify; margin-bottom: 30px; color: #334155;">
-          وعليه؛ فإننا نأمل منكم مد جسور التعاون من خلال مضاعفة المتابعة المنزلية، والوقوف على أسباب هذا التدني مع المعلمين المختصين بالمدرسة وإدارة التوجيه الطلابي، لتدارك الأمر والارتقاء بمستواه نحو التفوق المنشود بإذن الله.
-        </p>
-        
-        <p style="text-align: center; font-weight: 700; color: #064e3b; margin-top: 15px;">
-          شاكرين ومقدرين لكم كريم تعاونكم واهتمامكم،،،
-        </p>
-      </div>
-
-      <!-- التوقيعات الرسمية المعتمدة مع خطوط أنيقة -->
-      <div style="position: absolute; bottom: 50px; left: 60px; right: 60px; display: flex; justify-content: space-between; align-items: flex-end; padding-top: 20px; border-top: 1px dashed #cbd5e1;">
-        <div style="text-align: center; width: 200px;">
-          <p style="font-weight: 700; color: #475569; font-size: 13.5px; margin: 0 0 45px 0;">الموجه الطلابي</p>
-          <p style="font-weight: 800; color: #0f172a; font-size: 15px; margin: 0;">أ. هزان العثمان</p>
-        </div>
-
-        <div style="text-align: center; width: 140px;">
-          <div style="width: 110px; height: 110px; border: 2px dashed #94a3b8; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 12px; font-weight: 700;">
-            ختم المدرسة
-          </div>
-        </div>
-
-        <div style="text-align: center; width: 200px;">
-          <p style="font-weight: 700; color: #475569; font-size: 13.5px; margin: 0 0 45px 0;">مدير المدرسة</p>
-          <p style="font-weight: 800; color: #0f172a; font-size: 15px; margin: 0;">أ. زيد آل داود</p>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- المنطق البرمجي التفاعلي -->
-  <script>
-    const subjectsContainer = document.getElementById('subjectsContainer');
-    const addSubjectBtn = document.getElementById('addSubjectBtn');
-
-    // وظيفة إعادة ترقيم حقول الإدخال
-    function renumberSubjects() {
-      const rows = subjectsContainer.querySelectorAll('.subject-row');
-      rows.forEach((row, index) => {
-        const badge = row.querySelector('span');
-        badge.innerText = index + 1;
-        const deleteBtn = row.querySelector('.delete-btn');
-        if (deleteBtn) {
-          deleteBtn.style.visibility = rows.length > 1 ? 'visible' : 'hidden';
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إشعار تدني مستوى - مدرسة نعام</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- خط تجوال من جوجل -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <!-- مكتبة html2pdf -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Tajawal', 'sans-serif'] },
+                    colors: { emerald: { 700: '#047857', 800: '#065f46', 900: '#064e3b' } }
+                }
+            }
         }
-      });
-    }
+    </script>
+    <style>
+        body { background-color: #f3f4f6; }
+        
+        /* إخفاء القالب عن العرض العادي، يظهر فقط في الذاكرة للطباعة */
+        #pdf-template {
+            display: none;
+            width: 794px; /* عرض A4 بالبكسل */
+            min-height: 1123px; /* طول A4 بالبكسل */
+            background-color: white;
+            padding: 40px;
+            box-sizing: border-box;
+            color: #000;
+        }
 
-    // إضافة حقل مادة جديد عند النقر
-    addSubjectBtn.addEventListener('click', () => {
-      const rows = subjectsContainer.querySelectorAll('.subject-row');
-      if (rows.length >= 10) {
-        alert('الحد الأقصى هو 10 مواد دراسية للإشعار الواحد.');
-        return;
-      }
+        /* تنسيق مخصص للطباعة لضمان عدم تأثر الجدول */
+        .pdf-table th, .pdf-table td {
+            border: 1px solid #111;
+            padding: 10px;
+        }
+        
+        /* منع التقطيع بين الصفحات */
+        .avoid-break { page-break-inside: avoid; }
+    </style>
+</head>
+<body class="antialiased flex flex-col min-h-screen">
 
-      const newRow = document.createElement('div');
-      newRow.className = 'subject-row flex items-center gap-2';
-      newRow.innerHTML = `
-        <span class="w-7 h-9 flex items-center justify-center bg-slate-100 text-slate-600 font-bold text-xs rounded-lg border border-slate-200"></span>
-        <input type="text" class="subject-input flex-1 px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none" required placeholder="اسم المادة">
-        <button type="button" class="delete-btn w-9 h-9 flex items-center justify-center text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition" title="حذف المادة">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-        </button>
-      `;
+    <!-- واجهة المستخدم (لن تظهر في الطباعة) -->
+    <main id="app-ui" class="flex-grow p-4 md:p-8">
+        <div class="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl border-t-4 border-emerald-700 p-6 md:p-10">
+            <div class="text-center mb-10">
+                <h1 class="text-3xl font-extrabold text-emerald-800 mb-2">نظام إصدار إشعارات تدني المستوى</h1>
+                <p class="text-gray-500 font-medium">مدرسة نعام - الإدارة العامة للتعليم بمنطقة الرياض</p>
+            </div>
 
-      newRow.querySelector('.delete-btn').addEventListener('click', () => {
-        newRow.remove();
-        renumberSubjects();
-      });
+            <form id="notice-form" class="space-y-8">
+                <!-- البيانات الأساسية -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">اسم الطالب (رباعي)</label>
+                        <input type="text" id="studentName" required placeholder="مثال: محمد عبدالله محمد" class="w-full border border-gray-300 rounded-xl p-3 focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 outline-none transition">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">العام الدراسي</label>
+                        <input type="text" id="academicYear" value="1448 هـ" required class="w-full border border-gray-300 rounded-xl p-3 outline-none bg-gray-50">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">الفصل الدراسي</label>
+                        <select id="semester" class="w-full border border-gray-300 rounded-xl p-3 outline-none focus:ring-2 focus:ring-emerald-600">
+                            <option value="الأول">الأول</option>
+                            <option value="الثاني">الثاني</option>
+                            <option value="الثالث">الثالث</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">الفترة</label>
+                        <select id="period" class="w-full border border-gray-300 rounded-xl p-3 outline-none focus:ring-2 focus:ring-emerald-600">
+                            <option value="الفترة الأولى">الفترة الأولى</option>
+                            <option value="الفترة الثانية">الفترة الثانية</option>
+                            <option value="منتصف الفصل">منتصف الفصل</option>
+                            <option value="نهاية الفصل">نهاية الفصل</option>
+                        </select>
+                    </div>
+                </div>
 
-      subjectsContainer.appendChild(newRow);
-      renumberSubjects();
-      newRow.querySelector('input').focus();
-    });
+                <!-- المواد الدراسية -->
+                <div class="pt-6 border-t border-gray-100">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-bold text-gray-800">المواد الدراسية التي بها تدني</h2>
+                        <button type="button" onclick="addSubjectField()" class="text-sm bg-emerald-50 text-emerald-700 px-4 py-2 rounded-lg hover:bg-emerald-100 transition font-bold flex items-center gap-2">
+                            <span>+</span> إضافة مادة
+                        </button>
+                    </div>
+                    <div id="subjects-container" class="space-y-3">
+                        <div class="flex gap-2 subject-row">
+                            <input type="text" placeholder="اسم المادة (مثال: الرياضيات)" class="subject-input w-full border border-gray-300 rounded-xl p-3 outline-none focus:ring-2 focus:ring-emerald-600">
+                            <button type="button" onclick="this.parentElement.remove()" class="px-4 py-2 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition font-bold">حذف</button>
+                        </div>
+                    </div>
+                </div>
 
-    // معالجة النموذج وتوليد الخطاب
-    document.getElementById('noticeForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const btn = document.getElementById('submitBtn');
-      const originalText = btn.innerHTML;
-      btn.innerHTML = `
-        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-        </svg>
-        <span>جاري توليد المستند الرسمي وتجهيز الـ PDF...</span>
-      `;
-      btn.disabled = true;
+                <button type="button" onclick="generatePDF()" class="w-full bg-emerald-700 text-white font-bold text-lg py-4 rounded-xl hover:bg-emerald-800 shadow-lg hover:shadow-xl transition duration-300 flex justify-center items-center gap-2">
+                    إصدار وتحميل وثيقة الـ PDF
+                </button>
+            </form>
+        </div>
+    </main>
 
-      // جمع البيانات من الحقول
-      const name = document.getElementById('studentName').value.trim();
-      const term = document.getElementById('term').value;
-      const period = document.getElementById('period').value;
-      const year = document.getElementById('academicYear').value.trim();
+    <!-- تذييل الموقع (بصمة الإعداد) -->
+    <footer id="app-footer" class="py-6 text-center text-gray-500 font-medium text-sm">
+        تم إعداد الموقع بواسطة الأستاذ <span class="font-bold text-emerald-700">فيصل مدخلي</span>
+    </footer>
 
-      // جمع المواد المدخلة فعلياً وتجاهل أي فراغات
-      const subjectInputs = document.querySelectorAll('.subject-input');
-      const validSubjects = [];
-      subjectInputs.forEach(input => {
-        const val = input.value.trim();
-        if (val) validSubjects.push(val);
-      });
+    <!-- قالب الـ PDF المخفي (يُستخدم للطباعة فقط) -->
+    <div id="pdf-container">
+        <div id="pdf-template" class="border-[6px] border-double border-emerald-800 mx-auto relative bg-white">
+            
+            <!-- الترويسة الوزارية -->
+            <div class="flex justify-between items-start border-b-2 border-emerald-800 pb-6 mb-8">
+                <!-- اليمين: البيانات -->
+                <div class="text-[15px] font-bold leading-loose text-right w-1/3">
+                    <p>المملكة العربية السعودية</p>
+                    <p>وزارة التعليم</p>
+                    <p>الإدارة العامة للتعليم بمنطقة الرياض</p>
+                    <p>مدرسة نعام (ابتدائي - متوسط - ثانوي)</p>
+                </div>
+                
+                <!-- الوسط: الشعار (SVG) -->
+                <div class="w-1/3 flex flex-col items-center justify-center">
+                    <svg width="80" height="80" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="48" stroke="#047857" stroke-width="4" fill="white"/>
+                        <path d="M50 20 L50 80 M25 50 L75 50 M32.32 32.32 L67.68 67.68 M32.32 67.68 L67.68 32.32" stroke="#047857" stroke-width="2" opacity="0.3"/>
+                        <path d="M50 25 C30 25 20 40 20 40 C20 40 30 55 50 55 C70 55 80 40 80 40 C80 40 70 25 50 25 Z" fill="#047857"/>
+                        <path d="M50 45 C35 45 25 60 25 60 C25 60 35 75 50 75 C65 75 75 60 75 60 C75 60 65 45 50 45 Z" fill="#047857" opacity="0.8"/>
+                        <path d="M50 15 L50 85" stroke="white" stroke-width="2"/>
+                    </svg>
+                    <h2 class="text-xl font-extrabold text-emerald-900 mt-4 tracking-wider">إشعار مستوى تحصيلي</h2>
+                </div>
 
-      if (validSubjects.length === 0) {
-        alert('يرجى إدخال اسم مادة واحدة على الأقل.');
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-        return;
-      }
+                <!-- اليسار: التاريخ -->
+                <div class="text-[15px] font-bold leading-loose text-right w-1/3 pl-4" dir="rtl">
+                    <p>التاريخ: <span id="pdf-date"></span></p>
+                    <p>المرفقات: لا يوجد</p>
+                    <p>الموضوع: إشعار ولي الأمر</p>
+                </div>
+            </div>
 
-      // تعبئة البيانات في قالب الـ PDF
-      document.getElementById('pdfStudentName').innerText = name;
-      document.getElementById('pdfPeriodBadge').innerText = period;
-      document.getElementById('pdfYear').innerText = year;
-      document.getElementById('pdfTerm').innerText = term;
-      document.getElementById('pdfTermBody').innerText = term;
-      document.getElementById('pdfPeriodBody').innerText = period;
+            <!-- النص الخطابي الرسمي -->
+            <div class="mb-10 text-justify leading-[2.2] text-[17px]">
+                <p class="font-extrabold text-xl mb-4">المكرم ولي أمر الطالب / <span id="pdf-student-name" class="border-b-2 border-dashed border-gray-500 px-4 text-emerald-900"></span> <span class="text-sm font-normal">سلمه الله،</span></p>
+                <p>السلام عليكم ورحمة الله وبركاته، وبعد:</p>
+                <p>انطلاقاً من مبدأ التكامل والشراكة الإيجابية الوثيقة بين البيت والمدرسة، وحرصاً على مصلحة ابننا ومسيرته التعليمية، نود إحاطتكم علماً بأنه قد لوحظ تدنٍ وتراجع في مستواه التحصيلي خلال <span id="pdf-period" class="font-bold text-emerald-800"></span> من الفصل الدراسي <span id="pdf-semester" class="font-bold text-emerald-800"></span> للعام الدراسي <span id="pdf-year" class="font-bold text-emerald-800"></span>، وذلك في المقررات الدراسية الموضحة في الجدول أدناه.</p>
+                <p class="mt-2">نأمل منكم التكرم بمتابعة الطالب لحثه على مضاعفة الجهد، والتعاون معنا لمعالجة جوانب القصور للارتقاء بمستواه.</p>
+            </div>
 
-      // بناء جدول المواد في الـ PDF
-      const pdfTableBody = document.getElementById('pdfTableBody');
-      pdfTableBody.innerHTML = '';
-      validSubjects.forEach((sub, i) => {
-        const row = document.createElement('tr');
-        row.style.background = (i % 2 === 0) ? '#ffffff' : '#f8fafc';
-        row.innerHTML = `
-          <td style="border: 1px solid #cbd5e1; padding: 9px; font-weight: 700; color: #475569;">${i + 1}</td>
-          <td style="border: 1px solid #cbd5e1; padding: 9px; font-weight: 700; color: #0f172a; text-align: right; padding-right: 25px;">${sub}</td>
-        `;
-        pdfTableBody.appendChild(row);
-      });
+            <!-- جدول المواد -->
+            <table class="w-full text-center pdf-table mb-12 text-[16px] avoid-break">
+                <thead>
+                    <tr class="bg-gray-100">
+                        <th class="w-16 font-bold py-3">م</th>
+                        <th class="w-2/5 font-bold py-3">المقرر الدراسي</th>
+                        <th class="font-bold py-3">ملاحظات وتوقيع ولي الأمر</th>
+                    </tr>
+                </thead>
+                <tbody id="pdf-subjects-body">
+                    <!-- تُضاف المواد برمجياً -->
+                </tbody>
+            </table>
 
-      // التقاط العنصر وتوليد الـ PDF بمقاس A4
-      const element = document.getElementById('pdfContent');
+            <!-- التوقيعات والأختام -->
+            <div class="flex justify-between items-end mt-16 text-center font-bold absolute bottom-12 w-[calc(100%-80px)] avoid-break">
+                <div class="w-1/3">
+                    <p class="text-gray-600 mb-12">الموجه الطلابي</p>
+                    <p class="text-lg">أ. هزان العثمان</p>
+                </div>
+                <div class="w-1/3 flex justify-center items-center">
+                    <div class="w-28 h-28 border-2 border-dashed border-gray-300 rounded-full flex items-center justify-center text-gray-400 rotate-12">
+                        الختم الرسمي
+                    </div>
+                </div>
+                <div class="w-1/3">
+                    <p class="text-gray-600 mb-12">مدير المدرسة</p>
+                    <p class="text-lg">أ. زيد آل داود</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-      const opt = {
-        margin:       0,
-        filename:     `إشعار تدني - ${name} - ${period}.pdf`,
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
-        jsPDF:        { unit: 'px', format: [794, 1120], orientation: 'portrait' }
-      };
+    <!-- المنطق البرمجي -->
+    <script>
+        // إعداد التاريخ بصيغة نظيفة ومقروءة
+        const today = new Date();
+        const dateOptions = { year: 'numeric', month: '2-digit', day: '2-digit' };
+        document.getElementById('pdf-date').innerText = today.toLocaleDateString('ar-SA', dateOptions);
 
-      html2pdf().set(opt).from(element).save().then(() => {
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-      }).catch(err => {
-        console.error(err);
-        alert('حدث خطأ أثناء حفظ الملف، يرجى المحاولة مرة أخرى.');
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-      });
-    });
-  </script>
+        let subjectCount = 1;
+
+        function addSubjectField() {
+            if (subjectCount >= 10) {
+                alert("تم الوصول للحد الأقصى لعدد المواد.");
+                return;
+            }
+            const container = document.getElementById('subjects-container');
+            const row = document.createElement('div');
+            row.className = 'flex gap-2 subject-row mt-3';
+            row.innerHTML = `
+                <input type="text" placeholder="اسم المادة..." class="subject-input w-full border border-gray-300 rounded-xl p-3 outline-none focus:ring-2 focus:ring-emerald-600">
+                <button type="button" onclick="this.parentElement.remove(); subjectCount--;" class="px-4 py-2 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition font-bold">حذف</button>
+            `;
+            container.appendChild(row);
+            subjectCount++;
+        }
+
+        function generatePDF() {
+            // جلب البيانات
+            const studentName = document.getElementById('studentName').value.trim();
+            if (!studentName) { alert("الرجاء إدخال اسم الطالب"); return; }
+
+            const inputs = document.querySelectorAll('.subject-input');
+            const activeSubjects = Array.from(inputs).map(inp => inp.value.trim()).filter(val => val !== "");
+            if (activeSubjects.length === 0) { alert("الرجاء إدخال مقرر دراسي واحد على الأقل"); return; }
+
+            // تعبئة البيانات في القالب
+            document.getElementById('pdf-student-name').innerText = studentName;
+            document.getElementById('pdf-year').innerText = document.getElementById('academicYear').value;
+            document.getElementById('pdf-semester').innerText = document.getElementById('semester').value;
+            document.getElementById('pdf-period').innerText = document.getElementById('period').value;
+
+            // بناء الجدول
+            const tbody = document.getElementById('pdf-subjects-body');
+            tbody.innerHTML = '';
+            activeSubjects.forEach((subject, index) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="font-bold py-3">${index + 1}</td>
+                        <td class="font-bold py-3">${subject}</td>
+                        <td></td>
+                    </tr>
+                `;
+            });
+
+            // إعداد التصدير
+            const element = document.getElementById('pdf-template');
+            element.style.display = 'block'; // إظهار مؤقت للطباعة
+            
+            // إضافة شفافية للواجهة أثناء التصدير
+            document.getElementById('app-ui').style.opacity = '0.4';
+            document.getElementById('app-footer').style.opacity = '0.4';
+
+            const opt = {
+                margin:       0,
+                filename:     `إشعار_تدني_${studentName.replace(/\s+/g, '_')}.pdf`,
+                image:        { type: 'jpeg', quality: 1 },
+                html2canvas:  { scale: 2, useCORS: true, windowWidth: 794 },
+                jsPDF:        { unit: 'px', format: [794, 1123], orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                element.style.display = 'none'; // إعادة الإخفاء
+                document.getElementById('app-ui').style.opacity = '1';
+                document.getElementById('app-footer').style.opacity = '1';
+            });
+        }
+    </script>
 </body>
 </html>

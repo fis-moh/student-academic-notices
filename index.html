@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>نظام إشعارات تدني المستوى الدراسي</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+  <script src="https://unpkg.com/@pdf-lib/fontkit@0.0.4"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Cairo', sans-serif; }
+  </style>
+</head>
+<body class="bg-slate-100 min-h-screen py-8 px-4">
+  <div class="max-w-xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200">
+    <!-- الترويسة -->
+    <div class="bg-emerald-800 text-white p-6 text-center">
+      <h2 class="text-xl font-bold">المملكة العربية السعودية</h2>
+      <h3 class="text-sm opacity-90">الإدارة العامة للتعليم بمنطقة الرياض</h3>
+      <h3 class="text-sm opacity-90">ابتدائية ومتوسطة وثانوية نعام</h3>
+      <div class="mt-4 inline-block bg-emerald-700/80 px-4 py-1.5 rounded-full text-sm font-semibold">
+        إشعار تدني مستوى دراسي
+      </div>
+    </div>
+
+    <!-- النموذج -->
+    <form id="noticeForm" class="p-6 space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">اسم الطالب رباعي *</label>
+        <input type="text" id="studentName" required placeholder="أدخل اسم الطالب" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">الفصل الدراسي *</label>
+          <select id="term" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white">
+            <option value="الفصل الدراسي الأول">الفصل الدراسي الأول</option>
+            <option value="الفصل الدراسي الثاني">الفصل الدراسي الثاني</option>
+            <option value="الفصل الدراسي الثالث">الفصل الدراسي الثالث</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">الفترة *</label>
+          <select id="period" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white">
+            <option value="الفترة الأولى">الفترة الأولى</option>
+            <option value="الفترة الثانية">الفترة الثانية</option>
+            <option value="نهاية الفصل">نهاية الفصل</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">العام الدراسي *</label>
+        <input type="text" id="academicYear" required value="1448 هـ" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+      </div>
+
+      <!-- خانات المواد -->
+      <div class="border-t pt-4">
+        <label class="block text-sm font-semibold text-slate-700 mb-2">المواد التي يعاني فيها الطالب من تدنٍ:</label>
+        <div class="grid grid-cols-2 gap-3">
+          <input type="text" id="sub1" placeholder="المادة الأولى" class="px-3 py-2 border rounded-lg text-sm">
+          <input type="text" id="sub2" placeholder="المادة الثانية" class="px-3 py-2 border rounded-lg text-sm">
+          <input type="text" id="sub3" placeholder="المادة الثالثة" class="px-3 py-2 border rounded-lg text-sm">
+          <input type="text" id="sub4" placeholder="المادة الرابعة" class="px-3 py-2 border rounded-lg text-sm">
+          <input type="text" id="sub5" placeholder="المادة الخامسة" class="px-3 py-2 border rounded-lg text-sm">
+          <input type="text" id="sub6" placeholder="المادة السادسة" class="px-3 py-2 border rounded-lg text-sm">
+        </div>
+        <p class="text-xs text-slate-500 mt-1">* الحقول الفارغة ستظهر تلقائياً بشرطة (-).</p>
+      </div>
+
+      <!-- الإدارة والتوقيعات -->
+      <div class="bg-slate-50 p-3 rounded-lg text-xs text-slate-600 flex justify-between">
+        <span>الموجه الطلابي: <b>هزان العثمان</b></span>
+        <span>مدير المدرسة: <b>زيد آل داود</b></span>
+      </div>
+
+      <button type="submit" id="submitBtn" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-3 px-4 rounded-xl shadow transition duration-200">
+        توليد إشعار PDF وتحميله
+      </button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById('noticeForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      btn.innerText = 'جاري توليد ملف الـ PDF...';
+      btn.disabled = true;
+
+      const name = document.getElementById('studentName').value;
+      const term = document.getElementById('term').value;
+      const period = document.getElementById('period').value;
+      const year = document.getElementById('academicYear').value;
+      
+      const s1 = document.getElementById('sub1').value || '-';
+      const s2 = document.getElementById('sub2').value || '-';
+      const s3 = document.getElementById('sub3').value || '-';
+      const s4 = document.getElementById('sub4').value || '-';
+      const s5 = document.getElementById('sub5').value || '-';
+      const s6 = document.getElementById('sub6').value || '-';
+
+      try {
+        const { PDFDocument, rgb } = PDFLib;
+        const pdfDoc = await PDFDocument.create();
+        pdfDoc.registerFontkit(fontkit);
+
+        // تحميل خط عربي يدعم ترميز النصوص
+        const fontUrl = 'https://fonts.gstatic.com/s/amiri/v27/J7acnpF-01K8-3jZtqfK8Y1s.woff2';
+        const fontBytes = await fetch(fontUrl).then(res => res.arrayBuffer());
+        const customFont = await pdfDoc.embedFont(fontBytes);
+
+        const page = pdfDoc.addPage([595.28, 841.89]); // مقاس A4
+        const { width, height } = page.getSize();
+
+        // رسم إطار خارجي
+        page.drawRectangle({
+          x: 20, y: 20,
+          width: width - 40, height: height - 40,
+          borderWidth: 2,
+          borderColor: rgb(0.1, 0.4, 0.2),
+          color: rgb(1, 1, 1)
+        });
+
+        // الترويسة
+        page.drawText('المملكة العربية السعودية - وزارة التعليم', { x: 340, y: height - 60, size: 12, font: customFont });
+        page.drawText('الإدارة العامة للتعليم بمنطقة الرياض', { x: 360, y: height - 80, size: 12, font: customFont });
+        page.drawText('ابتدائية ومتوسطة وثانوية نعام', { x: 380, y: height - 100, size: 12, font: customFont });
+
+        // العنوان
+        page.drawText(`إشعار تدني مستوى دراسي (${period})`, { x: 180, y: height - 160, size: 16, font: customFont, color: rgb(0.7, 0.1, 0.1) });
+
+        // نص الخطاب
+        const bodyText = `إلى ولي أمر الطالب: ${name} المحترم\n` +
+          `السلام عليكم ورحمة الله وبركاته،،،\n` +
+          `نحيطكم علماً بأن ابنكم يواجه تدنياً في مستواه الدراسي خلال (${term}) للعام ${year} في المواد التالية:\n\n` +
+          `1. ${s1}    2. ${s2}    3. ${s3}\n` +
+          `4. ${s4}    5. ${s5}    6. ${s6}\n\n` +
+          `نأمل منكم التعاون ومتابعة الطالب حرصاً على مستقبله الدراسي.`;
+
+        page.drawText(bodyText, { x: 60, y: height - 230, size: 13, font: customFont, lineHeight: 22 });
+
+        // التوقيعات
+        page.drawText('الموجه الطلابي: هزان العثمان', { x: 360, y: 120, size: 12, font: customFont });
+        page.drawText('مدير المدرسة: زيد آل داود', { x: 90, y: 120, size: 12, font: customFont });
+
+        // حفظ وتحميل الملف
+        const pdfBytes = await pdfDoc.save();
+        const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `إشعار تدني - ${name} - ${period}.pdf`;
+        link.click();
+
+        alert('تم توليد إشعار PDF وتحميله بنجاح!');
+      } catch (err) {
+        console.error(err);
+        alert('حدث خطأ أثناء إنشاء الملف، يرجى المحاولة مرة أخرى.');
+      } finally {
+        btn.innerText = 'توليد إشعار PDF وتحميله';
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

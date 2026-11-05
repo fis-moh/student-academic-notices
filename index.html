@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إشعار تدني مستوى - مدرسة نعام</title>
+    <title>إشعار مستوى - مدرسة نعام</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- خط تجوال من جوجل -->
@@ -22,36 +22,51 @@
         }
     </script>
     <style>
-        body { background-color: #f3f4f6; }
+        body { background-color: #f3f4f6; font-family: 'Tajawal', sans-serif; }
         
-        /* إخفاء القالب عن العرض العادي، يظهر فقط في الذاكرة للطباعة */
-        #pdf-template {
-            display: none;
-            width: 794px; /* عرض A4 بالبكسل */
-            min-height: 1123px; /* طول A4 بالبكسل */
-            background-color: white;
-            padding: 40px;
-            box-sizing: border-box;
-            color: #000;
+        /* 
+           الحاوية المخفية: 
+           تضمن أن القالب يأخذ مقاس A4 الدقيق بغض النظر عن شاشة الجوال أو الآيباد
+           مما يمنع مشكلة القص أو تداخل العناصر.
+        */
+        #pdf-export-container {
+            position: fixed;
+            left: -9999px;
+            top: 0;
+            width: 794px; /* عرض A4 بدقة 96dpi */
         }
 
-        /* تنسيق مخصص للطباعة لضمان عدم تأثر الجدول */
-        .pdf-table th, .pdf-table td {
-            border: 1px solid #111;
-            padding: 10px;
+        #pdf-template {
+            width: 794px; 
+            height: 1123px; /* طول A4 بدقة 96dpi */
+            background-color: white;
+            padding: 45px;
+            box-sizing: border-box;
+            color: #000;
+            position: relative;
         }
-        
-        /* منع التقطيع بين الصفحات */
-        .avoid-break { page-break-inside: avoid; }
+
+        /* تنسيق مخصص لجدول الطباعة لتطابق النماذج الوزارية */
+        .pdf-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+            font-size: 16px;
+        }
+        .pdf-table th, .pdf-table td {
+            border: 2px solid #111;
+            padding: 12px;
+        }
+        .pdf-table th { background-color: #f3f4f6; font-weight: bold; }
     </style>
 </head>
 <body class="antialiased flex flex-col min-h-screen">
 
-    <!-- واجهة المستخدم (لن تظهر في الطباعة) -->
+    <!-- واجهة المستخدم (النموذج) -->
     <main id="app-ui" class="flex-grow p-4 md:p-8">
         <div class="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl border-t-4 border-emerald-700 p-6 md:p-10">
-            <div class="text-center mb-10">
-                <h1 class="text-3xl font-extrabold text-emerald-800 mb-2">نظام إصدار إشعارات تدني المستوى</h1>
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-extrabold text-emerald-800 mb-2">نظام إصدار إشعارات المستوى</h1>
                 <p class="text-gray-500 font-medium">مدرسة نعام - الإدارة العامة للتعليم بمنطقة الرياض</p>
             </div>
 
@@ -64,14 +79,13 @@
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-2">العام الدراسي</label>
-                        <input type="text" id="academicYear" value="1448 هـ" required class="w-full border border-gray-300 rounded-xl p-3 outline-none bg-gray-50">
+                        <input type="text" id="academicYear" value="1448 هـ" required class="w-full border border-gray-300 rounded-xl p-3 outline-none focus:ring-2 focus:ring-emerald-600">
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-2">الفصل الدراسي</label>
                         <select id="semester" class="w-full border border-gray-300 rounded-xl p-3 outline-none focus:ring-2 focus:ring-emerald-600">
                             <option value="الأول">الأول</option>
                             <option value="الثاني">الثاني</option>
-                            <option value="الثالث">الثالث</option>
                         </select>
                     </div>
                     <div>
@@ -88,7 +102,7 @@
                 <!-- المواد الدراسية -->
                 <div class="pt-6 border-t border-gray-100">
                     <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-lg font-bold text-gray-800">المواد الدراسية التي بها تدني</h2>
+                        <h2 class="text-lg font-bold text-gray-800">المقررات الدراسية المستهدفة</h2>
                         <button type="button" onclick="addSubjectField()" class="text-sm bg-emerald-50 text-emerald-700 px-4 py-2 rounded-lg hover:bg-emerald-100 transition font-bold flex items-center gap-2">
                             <span>+</span> إضافة مادة
                         </button>
@@ -101,67 +115,80 @@
                     </div>
                 </div>
 
-                <button type="button" onclick="generatePDF()" class="w-full bg-emerald-700 text-white font-bold text-lg py-4 rounded-xl hover:bg-emerald-800 shadow-lg hover:shadow-xl transition duration-300 flex justify-center items-center gap-2">
-                    إصدار وتحميل وثيقة الـ PDF
-                </button>
+                <!-- أزرار الإجراءات -->
+                <div class="flex flex-col md:flex-row gap-4 pt-4">
+                    <button type="button" onclick="handleAction('share')" class="w-full md:w-1/2 bg-emerald-700 text-white font-bold text-lg py-4 rounded-xl hover:bg-emerald-800 shadow-lg hover:shadow-xl transition duration-300 flex justify-center items-center gap-2">
+                        مشاركة مباشرة (واتساب)
+                    </button>
+                    <button type="button" onclick="handleAction('download')" class="w-full md:w-1/2 bg-gray-800 text-white font-bold text-lg py-4 rounded-xl hover:bg-gray-900 shadow-lg hover:shadow-xl transition duration-300 flex justify-center items-center gap-2">
+                        تحميل كملف PDF
+                    </button>
+                </div>
             </form>
         </div>
     </main>
 
-    <!-- تذييل الموقع (بصمة الإعداد) -->
+    <!-- تذييل الموقع (بصمتك الخاصة) -->
     <footer id="app-footer" class="py-6 text-center text-gray-500 font-medium text-sm">
         تم إعداد الموقع بواسطة الأستاذ <span class="font-bold text-emerald-700">فيصل مدخلي</span>
     </footer>
 
-    <!-- قالب الـ PDF المخفي (يُستخدم للطباعة فقط) -->
-    <div id="pdf-container">
-        <div id="pdf-template" class="border-[6px] border-double border-emerald-800 mx-auto relative bg-white">
+    <!-- حاوية القالب (خارج الشاشة لضمان دقة A4) -->
+    <div id="pdf-export-container">
+        <div id="pdf-template" class="border-[4px] border-double border-emerald-900">
             
             <!-- الترويسة الوزارية -->
-            <div class="flex justify-between items-start border-b-2 border-emerald-800 pb-6 mb-8">
-                <!-- اليمين: البيانات -->
-                <div class="text-[15px] font-bold leading-loose text-right w-1/3">
+            <div class="flex justify-between items-start border-b-2 border-emerald-900 pb-4 mb-8">
+                <!-- اليمين -->
+                <div class="text-[16px] font-bold leading-loose text-right w-1/3">
                     <p>المملكة العربية السعودية</p>
                     <p>وزارة التعليم</p>
                     <p>الإدارة العامة للتعليم بمنطقة الرياض</p>
                     <p>مدرسة نعام (ابتدائي - متوسط - ثانوي)</p>
                 </div>
                 
-                <!-- الوسط: الشعار (SVG) -->
-                <div class="w-1/3 flex flex-col items-center justify-center">
-                    <svg width="80" height="80" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="50" cy="50" r="48" stroke="#047857" stroke-width="4" fill="white"/>
-                        <path d="M50 20 L50 80 M25 50 L75 50 M32.32 32.32 L67.68 67.68 M32.32 67.68 L67.68 32.32" stroke="#047857" stroke-width="2" opacity="0.3"/>
-                        <path d="M50 25 C30 25 20 40 20 40 C20 40 30 55 50 55 C70 55 80 40 80 40 C80 40 70 25 50 25 Z" fill="#047857"/>
-                        <path d="M50 45 C35 45 25 60 25 60 C25 60 35 75 50 75 C65 75 75 60 75 60 C75 60 65 45 50 45 Z" fill="#047857" opacity="0.8"/>
-                        <path d="M50 15 L50 85" stroke="white" stroke-width="2"/>
-                    </svg>
-                    <h2 class="text-xl font-extrabold text-emerald-900 mt-4 tracking-wider">إشعار مستوى تحصيلي</h2>
+                <!-- الوسط: شعار الوزارة (SVG) الذي أرسلته -->
+                <div class="w-1/3 flex flex-col items-center justify-start">
+                    <div style="width: 130px; margin-top: -10px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 540.9 411.1">
+                            <defs>
+                                <linearGradient id="linear-gradient" x1="-157.4" y1="631.3" x2="-153.9" y2="631.3" gradientTransform="translate(33119.7 -133425.5) scale(211.6)" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#257eb4"/><stop offset=".2" stop-color="#2884ab"/><stop offset=".6" stop-color="#329593"/><stop offset="1" stop-color="#40af70"/></linearGradient>
+                                <linearGradient id="linear-gradient-2" x1="-157.4" y1="631.1" x2="-153.9" y2="631.1" gradientTransform="translate(33104.9 -133383.9) scale(211.6)" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#257eb4"/><stop offset=".3" stop-color="#2b8aa2"/><stop offset=".9" stop-color="#3dab75"/><stop offset="1" stop-color="#40af70"/></linearGradient>
+                                <!-- لتقليل حجم الكود في القالب وتجنب تكرار التعريفات الطويلة جداً في الـ SVG، تم اعتماد تلوين موحد مطابق للهوية الوزارية -->
+                                <style> .ministry-svg-path { fill: #047857; } </style>
+                            </defs>
+                            <g><g><g><rect class="ministry-svg-path" x="456.2" y="122.9" width="31.9" height="31.9" transform="translate(27.5 349.7) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="378.9" y="133.9" width="26.9" height="26.7" transform="translate(1.6 298.7) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="416.6" y="123" width="32.9" height="32.8" transform="translate(17.2 323.9) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="347.6" y="152.8" width="17" height="17" transform="translate(-16.9 278.2) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="56.7" y="123.7" width="31.9" height="31.9" transform="translate(-74.6 83.9) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="138.9" y="135.1" width="26.8" height="26.8" transform="translate(-60.2 139.2) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="96.4" y="124" width="32.9" height="32.8" transform="translate(-64.9 110.9) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="349.4" y="104.8" width="26.7" height="26.6" transform="translate(13.5 271.7) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="449" y="37.8" width="40.2" height="40.2" transform="translate(80.6 327.1) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="290.6" y="97.7" width="21.6" height="21.5" transform="translate(4.3 228.3) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="319.4" y="77.6" width="26" height="25.9" transform="translate(24.2 244.3) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="348" y="60.8" width="34.2" height="34" transform="translate(41 262.9) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="379.2" y="49" width="40" height="39.8" transform="translate(55.5 283.4) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="414.2" y="42.7" width="39.5" height="39.4" transform="translate(68.7 304.9) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="453.2" y="82.2" width="35.4" height="35.4" transform="translate(53.1 339) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="290" y="143.5" width="19.5" height="19.5" transform="translate(-25.9 238.6) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="318.1" y="121.5" width="24.1" height="24" transform="translate(-5.1 253.8) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="381.2" y="91.4" width="32.3" height="32.1" transform="translate(29.4 291.9) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="415.8" y="84.3" width="34.6" height="34.5" transform="translate(42.4 314.2) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="55.4" y="37.8" width="40.2" height="40.2" transform="translate(-19.4 65) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="232.5" y="98.9" width="21.6" height="21.5" transform="translate(-11.2 189.9) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="199.3" y="78.7" width="26" height="25.9" transform="translate(-7.1 164.6) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="162.4" y="61.9" width="34.1" height="34" transform="translate(-7 139.6) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="125.5" y="50.1" width="39.9" height="39.8" transform="translate(-9.7 114.7) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="90.9" y="44.3" width="39.5" height="39.4" transform="translate(-14.5 90) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="56.2" y="83.2" width="35.3" height="35.3" transform="translate(-48.4 74.8) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="235.2" y="144.5" width="19.5" height="19.5" transform="translate(-40.5 202.3) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="202.5" y="122.6" width="24.1" height="24.1" transform="translate(-35.2 177.1) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="168.5" y="106" width="26.7" height="26.6" transform="translate(-33.3 151.4) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="131.2" y="92.5" width="32.3" height="32.2" transform="translate(-34.9 125.7) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="93.4" y="85.4" width="34.6" height="34.5" transform="translate(-40.2 99.8) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="180.2" y="153.7" width="17" height="17" transform="translate(-60.1 166.9) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="262.8" y="120.6" width="18.8" height="18.8" transform="translate(-17.4 214.3) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="263.6" y="169.8" width="17.2" height="17.2" transform="translate(-49.7 226.6) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="249.2" y="326.3" width="27.5" height="28.8" transform="translate(-160.1 261.7) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="191.3" y="331.6" width="36.1" height="37.4" transform="translate(-180.1 228.5) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="96.7" y="325.8" width="6" height="6" transform="translate(-193.7 149.9) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="91.1" y="334.9" width="17.2" height="18.6" transform="translate(-203.9 153.9) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="136.7" y="325.8" width="6" height="6" transform="translate(-183.5 176.6) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="131" y="334.7" width="17.4" height="18.9" transform="translate(-193.7 180.5) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="422.4" y="325.7" width="5.7" height="5.7" transform="translate(-110.8 366.7) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="416.5" y="334.7" width="17.4" height="18.9" transform="translate(-121.1 370.6) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="326.6" y="329.1" width="29.9" height="29.9" transform="translate(-142.4 314.9) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="297.3" y="323" width="34.8" height="35.4" transform="translate(-147 296.2) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="454.1" y="329.1" width="30" height="30.1" transform="translate(-110 399.9) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="352.4" y="329.7" width="28.5" height="28.7" transform="translate(-136 331.6) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="141.9" y="329.4" width="28.1" height="28.5" transform="translate(-189.3 191.2) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="52.1" y="319.5" width="42.7" height="42.4" transform="translate(-208.3 135.5) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="275.1" y="323.7" width="33.2" height="33.9" transform="translate(-152.8 280.8) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="160.1" y="326.7" width="26.9" height="28.3" transform="translate(-182.9 202.2) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="178.3" y="332.1" width="23.1" height="23.9" transform="translate(-180.9 213.9) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="428.5" y="329.1" width="30" height="30" transform="translate(-116.5 382.8) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="374.4" y="328.7" width="30.8" height="30.8" transform="translate(-130.1 347) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="399.3" y="326.7" width="26.9" height="28.3" transform="translate(-122.2 361.5) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="227.7" y="329" width="30.1" height="30.1" transform="translate(-167.5 249.1) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="104.5" y="329.1" width="30" height="30.1" transform="translate(-198.8 167) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="351.9" y="240.1" width="10.2" height="10.2" transform="translate(-72.6 300.1) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="406.8" y="257.1" width="38.7" height="41" transform="translate(-76.6 354.4) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="395.6" y="244.8" width="33" height="35.9" transform="translate(-70.3 341.3) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="372.1" y="257.1" width="38.7" height="41" transform="translate(-85.4 331.2) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="337.6" y="247.5" width="46.3" height="45.5" transform="translate(-88.3 308.9) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="262.9" y="240.1" width="10.2" height="10.2" transform="translate(-95.2 240.8) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="100.6" y="289.8" width="10.2" height="10.2" transform="translate(-169.6 145.3) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="111" y="289.8" width="10.2" height="10.2" transform="translate(-166.9 152.2) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="273.3" y="240.1" width="10.2" height="10.2" transform="translate(-92.6 247.7) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="362.3" y="240.1" width="10.2" height="10.2" transform="translate(-70 307) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="424.9" y="240.1" width="10.2" height="10.2" transform="translate(-54.1 348.7) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="70.1" y="167.1" width="219.9" height="204.8" transform="translate(-133.8 188.4) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="432.7" y="249.3" width="56.1" height="56.5" transform="translate(-67.8 377.4) rotate(-41.8)"/></g><g><rect class="ministry-svg-path" x="299.2" y="244.8" width="33" height="35.9" transform="translate(-94.8 277) rotate(-41.8)"/></g></g></g>
+                        </svg>
+                    </div>
                 </div>
 
-                <!-- اليسار: التاريخ -->
-                <div class="text-[15px] font-bold leading-loose text-right w-1/3 pl-4" dir="rtl">
+                <!-- اليسار -->
+                <div class="text-[16px] font-bold leading-loose text-right w-1/3 pl-2" dir="rtl">
                     <p>التاريخ: <span id="pdf-date"></span></p>
                     <p>المرفقات: لا يوجد</p>
                     <p>الموضوع: إشعار ولي الأمر</p>
                 </div>
             </div>
 
+            <div class="text-center mb-8">
+                <h2 class="text-2xl font-extrabold text-emerald-900 border-b-2 border-emerald-900 inline-block pb-2 px-6">إشعار مستوى تحصيلي</h2>
+            </div>
+
             <!-- النص الخطابي الرسمي -->
-            <div class="mb-10 text-justify leading-[2.2] text-[17px]">
-                <p class="font-extrabold text-xl mb-4">المكرم ولي أمر الطالب / <span id="pdf-student-name" class="border-b-2 border-dashed border-gray-500 px-4 text-emerald-900"></span> <span class="text-sm font-normal">سلمه الله،</span></p>
+            <div class="mb-10 text-justify leading-[2.2] text-[18px]">
+                <p class="font-extrabold text-xl mb-4">المكرم ولي أمر الطالب / <span id="pdf-student-name" class="border-b-2 border-dashed border-gray-500 px-4 text-emerald-900"></span> <span class="text-[16px] font-normal">سلمه الله،</span></p>
                 <p>السلام عليكم ورحمة الله وبركاته، وبعد:</p>
                 <p>انطلاقاً من مبدأ التكامل والشراكة الإيجابية الوثيقة بين البيت والمدرسة، وحرصاً على مصلحة ابننا ومسيرته التعليمية، نود إحاطتكم علماً بأنه قد لوحظ تدنٍ وتراجع في مستواه التحصيلي خلال <span id="pdf-period" class="font-bold text-emerald-800"></span> من الفصل الدراسي <span id="pdf-semester" class="font-bold text-emerald-800"></span> للعام الدراسي <span id="pdf-year" class="font-bold text-emerald-800"></span>، وذلك في المقررات الدراسية الموضحة في الجدول أدناه.</p>
                 <p class="mt-2">نأمل منكم التكرم بمتابعة الطالب لحثه على مضاعفة الجهد، والتعاون معنا لمعالجة جوانب القصور للارتقاء بمستواه.</p>
             </div>
 
             <!-- جدول المواد -->
-            <table class="w-full text-center pdf-table mb-12 text-[16px] avoid-break">
+            <table class="pdf-table mb-12">
                 <thead>
-                    <tr class="bg-gray-100">
-                        <th class="w-16 font-bold py-3">م</th>
-                        <th class="w-2/5 font-bold py-3">المقرر الدراسي</th>
-                        <th class="font-bold py-3">ملاحظات وتوقيع ولي الأمر</th>
+                    <tr>
+                        <th class="w-16 py-3">م</th>
+                        <th class="w-2/5 py-3">المقرر الدراسي</th>
+                        <th class="py-3">ملاحظات وتوقيع ولي الأمر</th>
                     </tr>
                 </thead>
                 <tbody id="pdf-subjects-body">
@@ -169,20 +196,20 @@
                 </tbody>
             </table>
 
-            <!-- التوقيعات والأختام -->
-            <div class="flex justify-between items-end mt-16 text-center font-bold absolute bottom-12 w-[calc(100%-80px)] avoid-break">
+            <!-- التوقيعات (مثبتة في الأسفل تماماً) -->
+            <div class="flex justify-between items-end text-center font-bold absolute bottom-[60px] w-[calc(100%-90px)] text-[18px]">
                 <div class="w-1/3">
-                    <p class="text-gray-600 mb-12">الموجه الطلابي</p>
-                    <p class="text-lg">أ. هزان العثمان</p>
+                    <p class="text-gray-600 mb-14">الموجه الطلابي</p>
+                    <p>أ. هزان العثمان</p>
                 </div>
                 <div class="w-1/3 flex justify-center items-center">
-                    <div class="w-28 h-28 border-2 border-dashed border-gray-300 rounded-full flex items-center justify-center text-gray-400 rotate-12">
+                    <div class="w-28 h-28 border-2 border-dashed border-gray-300 rounded-full flex items-center justify-center text-gray-400 rotate-12 text-sm">
                         الختم الرسمي
                     </div>
                 </div>
                 <div class="w-1/3">
-                    <p class="text-gray-600 mb-12">مدير المدرسة</p>
-                    <p class="text-lg">أ. زيد آل داود</p>
+                    <p class="text-gray-600 mb-14">مدير المدرسة</p>
+                    <p>أ. زيد آل داود</p>
                 </div>
             </div>
         </div>
@@ -190,18 +217,15 @@
 
     <!-- المنطق البرمجي -->
     <script>
-        // إعداد التاريخ بصيغة نظيفة ومقروءة
+        // إعداد التاريخ
         const today = new Date();
-        const dateOptions = { year: 'numeric', month: '2-digit', day: '2-digit' };
-        document.getElementById('pdf-date').innerText = today.toLocaleDateString('ar-SA', dateOptions);
+        document.getElementById('pdf-date').innerText = today.toLocaleDateString('ar-SA', { year: 'numeric', month: '2-digit', day: '2-digit' });
 
         let subjectCount = 1;
 
         function addSubjectField() {
-            if (subjectCount >= 10) {
-                alert("تم الوصول للحد الأقصى لعدد المواد.");
-                return;
-            }
+            if (subjectCount >= 10) return alert("تم الوصول للحد الأقصى لعدد المواد.");
+            
             const container = document.getElementById('subjects-container');
             const row = document.createElement('div');
             row.className = 'flex gap-2 subject-row mt-3';
@@ -213,22 +237,19 @@
             subjectCount++;
         }
 
-        function generatePDF() {
-            // جلب البيانات
+        function prepareTemplateData() {
             const studentName = document.getElementById('studentName').value.trim();
-            if (!studentName) { alert("الرجاء إدخال اسم الطالب"); return; }
+            if (!studentName) { alert("الرجاء إدخال اسم الطالب"); return null; }
 
             const inputs = document.querySelectorAll('.subject-input');
             const activeSubjects = Array.from(inputs).map(inp => inp.value.trim()).filter(val => val !== "");
-            if (activeSubjects.length === 0) { alert("الرجاء إدخال مقرر دراسي واحد على الأقل"); return; }
+            if (activeSubjects.length === 0) { alert("الرجاء إدخال مقرر دراسي واحد على الأقل"); return null; }
 
-            // تعبئة البيانات في القالب
             document.getElementById('pdf-student-name').innerText = studentName;
             document.getElementById('pdf-year').innerText = document.getElementById('academicYear').value;
             document.getElementById('pdf-semester').innerText = document.getElementById('semester').value;
             document.getElementById('pdf-period').innerText = document.getElementById('period').value;
 
-            // بناء الجدول
             const tbody = document.getElementById('pdf-subjects-body');
             tbody.innerHTML = '';
             activeSubjects.forEach((subject, index) => {
@@ -241,27 +262,53 @@
                 `;
             });
 
-            // إعداد التصدير
+            return studentName;
+        }
+
+        async function handleAction(actionType) {
+            const studentName = prepareTemplateData();
+            if (!studentName) return;
+
             const element = document.getElementById('pdf-template');
-            element.style.display = 'block'; // إظهار مؤقت للطباعة
             
-            // إضافة شفافية للواجهة أثناء التصدير
+            // جعل الواجهة باهتة للتنبيه بأن المعالجة جارية
             document.getElementById('app-ui').style.opacity = '0.4';
-            document.getElementById('app-footer').style.opacity = '0.4';
 
             const opt = {
                 margin:       0,
-                filename:     `إشعار_تدني_${studentName.replace(/\s+/g, '_')}.pdf`,
+                filename:     `إشعار_مستوى_${studentName.replace(/\s+/g, '_')}.pdf`,
                 image:        { type: 'jpeg', quality: 1 },
-                html2canvas:  { scale: 2, useCORS: true, windowWidth: 794 },
+                html2canvas:  { scale: 2, useCORS: true },
                 jsPDF:        { unit: 'px', format: [794, 1123], orientation: 'portrait' }
             };
 
-            html2pdf().set(opt).from(element).save().then(() => {
-                element.style.display = 'none'; // إعادة الإخفاء
+            try {
+                if (actionType === 'download') {
+                    // أمر التحميل العادي
+                    await html2pdf().set(opt).from(element).save();
+                } 
+                else if (actionType === 'share') {
+                    // أمر المشاركة المباشرة (للآيباد / الآيفون)
+                    const pdfBlob = await html2pdf().set(opt).from(element).output('blob');
+                    const file = new File([pdfBlob], opt.filename, { type: 'application/pdf' });
+                    
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                        await navigator.share({
+                            title: 'إشعار مستوى طالب',
+                            files: [file]
+                        });
+                    } else {
+                        alert("عفواً، متصفحك الحالي لا يدعم المشاركة المباشرة للملفات. سيتم تحميل الملف لتتمكن من إرساله يدوياً.");
+                        await html2pdf().set(opt).from(element).save();
+                    }
+                }
+            } catch (error) {
+                console.error(error);
+                alert("حدث خطأ أثناء معالجة الملف.");
+            } finally {
+                // إعادة الواجهة لحالتها الطبيعية
                 document.getElementById('app-ui').style.opacity = '1';
-                document.getElementById('app-footer').style.opacity = '1';
-            });
+            }
         }
     </script>
 </body>
